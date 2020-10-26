@@ -145,8 +145,8 @@ function trackingNumberMatchCheck(trackingNumber) {
  * @returns void
  * code:200
  */
-function setSuccessMeta(){
-    responseObject.meta.code = 4001;
+function setSuccessMeta() {
+    responseObject.meta.code = 200;
     responseObject.meta.type = 'Success';
     responseObject.meta.message = 'The request was successful.';
 }
@@ -194,7 +194,6 @@ function invalidTrackingNumber() {
     responseObject.meta.type = 'Bad Request';
     responseObject.meta.message = 'invalid tracking_number';
 }
-
 
 /**
  * の処理
