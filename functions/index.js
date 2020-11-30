@@ -4,17 +4,13 @@ admin.initializeApp();
 const fetch = require('node-fetch');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
+const requestCheck = require('./module/requestchecker.js');//リクエストチェック用関数
+const metaSetControl = require('./module/setmeta.js');//メタオブジェクトセット用関数
 
-/**
- * レスポンス用オブジェクト生成
- */
+//レスポンス用オブジェクト
 
-let responseObject = {
-    meta: {
-        code: null,                     //httpレスポンスステータスコード
-        type: null,                     //httpレスポンスステータスタイプ
-        message: null,                  //httpレスポンスメッセージ
-    },
+const responseObject = {
+    meta: {},
     data: {
         tracking_number: null,          //追跡番号
         delivery_carrier_code: null,    //配送業者
@@ -33,6 +29,8 @@ let responseObject = {
  * @param {string} requestNo
  * @returns string --createTrakingInfo関数にて成形されたJsonデータをreturnします。
  */
+
+ /*
 async function getTrackingInfoJapanPost(requestNo) {
     const res = await fetch(`https://trackings.post.japanpost.jp/services/srv/search/?requestNo1=${requestNo}&search.x=97&search.y=18&startingUrlPatten=&locale=ja`);
     const html = await res.text();
@@ -44,6 +42,7 @@ async function getTrackingInfoJapanPost(requestNo) {
     return result;
 
 };
+*/
 
 /**
  * domデータを成形しオブジェクトに格納する。
@@ -51,6 +50,7 @@ async function getTrackingInfoJapanPost(requestNo) {
  * @param {string} deliveryCarrierCode 
  */
 
+ /*
 function createTrakingInfo(jpTrackingInfo, deliveryCarrierCode) {
     if (deliveryCarrierCode == 'JP') {
         //JP追跡情報成形
@@ -71,147 +71,26 @@ function createTrakingInfo(jpTrackingInfo, deliveryCarrierCode) {
         //Sagawa追跡情報成形
     }
 }
+*/
 
 
 
-/**
- * delivery_carrier_codeチェック関数
- * @param {object} request 
- * @returns boolean
- */
-function requestDeliveryCarrierCodeCheck(request) {
-    if (!request.query.delivery_carrier_code) {
-        //delivery_carrier_codeが設定されていない
-        noDeliveryCarrierCode();
-        return false;
-    } else if (!deliveryCarrierCodeMatchCheck(request.query.delivery_carrier_code)) {
-        //delivery_carrier_codeが無効な値
-        invalidDeliveryCarrierCode();
-        return false;
-    } else {
-        return true;
-    }
-}
 
-/**
- * delivery_carrier_code一致確認
- * @param {string} requestCarrier
- * @returns boolean 
- */
-function deliveryCarrierCodeMatchCheck(requestCarrier) {
-    const deliveryCarrierList = ['JP', 'Yamato', 'Sagawa'];
-    if (deliveryCarrierList.includes(requestCarrier)) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
-/**
- * tracking_numberチェック関数
- * @param {object} request 
- * @returns boolean
- */
-function requestTrackingNumberCheck(request) {
-    if (!request.query.tracking_number) {
-        //tracking_numberが設定されていない
-        noTrackingNumber();
-        return false;
-    } else if (!trackingNumberMatchCheck(request.query.tracking_number)) {
-        //tracking_numberが無効な値
-        invalidTrackingNumber();
-        return false;
-    } else {
-        return true;
-    }
 
-}
-/**
- * tracking_number一致確認
- * @param {string} trackingNumber 
- */
-function trackingNumberMatchCheck(trackingNumber) {
-    //正規表現パターン
-    const regex = new RegExp(/^[0-9\-]+$/);
-    if (regex.test(trackingNumber)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
- * リクエストが成功した際のオブジェクト更新
- * @returns void
- * code:200
- */
-function setSuccessMeta() {
-    responseObject.meta.code = 200;
-    responseObject.meta.type = 'Success';
-    responseObject.meta.message = 'The request was successful.';
-}
-
-/**
- * delivery_carrier_codeが設定されていない場合のオブジェクト更新
- * @returns void
- * code:4001
- */
-function noDeliveryCarrierCode() {
-    responseObject.meta.code = 4001;
-    responseObject.meta.type = 'Bad Request';
-    responseObject.meta.message = 'delivery_carrier_code is not set.';
-}
-
-/**
- * tracking_numberが設定されていない場合のオブジェクト更新
- * @returns void
- * code:4002
- */
-function noTrackingNumber() {
-    responseObject.meta.code = 4002;
-    responseObject.meta.type = 'Bad Request';
-    responseObject.meta.message = 'tracking_number is not set.';
-}
-
-/**
- * delivery_carrier_codeが無効な値の場合のオブジェクト更新
- * @returns void
- * code:4003
- */
-function invalidDeliveryCarrierCode() {
-    responseObject.meta.code = 4003;
-    responseObject.meta.type = 'Bad Request';
-    responseObject.meta.message = 'invalid delivery_carrier_code';
-}
-
-/**
- * tracking_numberが無効な値の場合のオブジェクト更新
- * @returns void
- * code:4004
- */
-function invalidTrackingNumber() {
-    responseObject.meta.code = 4004;
-    responseObject.meta.type = 'Bad Request';
-    responseObject.meta.message = 'invalid tracking_number';
-}
 
 /**
  * の処理
  * @returns boulean
  * responseObjectのmetaオブジェクトを更新します。
  */
-function mainControl(request) {
-    if (!requestDeliveryCarrierCodeCheck(request)) {
-        //delivery_carrier_codeチェックNG
-        return false;
-    } else {
-        if (!requestTrackingNumberCheck(request)) {
-            //tracking_numberチェックNF
-            return false;
-        } else {
-            return true;
-        }
-    }
+const mainControl = (request) => {
+
+    //リクエスト内容のチェックを行う
+    const metaCode = requestCheck(request);
+
+    //メタコードでオブジェクトを更新する
+    responseObject.meta = metaSetControl(metaCode);
 
 }
 
@@ -227,16 +106,21 @@ exports.getTrackingJson = functions.https.onRequest((request, response) => {
     response.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS, POST'); // DELETEだけは拒否
     response.set('Access-Control-Allow-Headers', 'Content-Type'); // Content-Typeのみを許可
 
-    if (mainControl(request)) {
-        console.log(request);
-        getTrackingInfoJapanPost(request.query.tracking_number).then(r => {
-            response.send(`${JSON.stringify(r)}`);
-        }, e => {
-            response.send(`エラーだよ`);
-        });
-    } else {
-        response.send(`${JSON.stringify(responseObject)}`);
-    }
+    mainControl(request);
+
+    response.send(`${JSON.stringify(responseObject)}`);
+
+    /*
+        if (mainControl(request)) {
+            getTrackingInfoJapanPost(request.query.tracking_number).then(r => {
+                response.send(`${JSON.stringify(r)}`);
+            }, e => {
+                response.send(`エラーだよ`);
+            });
+        } else {
+            response.send(`${JSON.stringify(responseObject)}`);
+        }
+    */
 
 });
 
