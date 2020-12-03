@@ -4,7 +4,7 @@
  * @returns boolean 
  */
 const deliveryCarrierCodeMatchCheck = (requestCarrier) => {
-    const deliveryCarrierList = ['JP', 'Yamato', 'Sagawa'];
+    const deliveryCarrierList = ['JP', 'YM', 'SG'];
     if (deliveryCarrierList.includes(requestCarrier)) {
         return true;
     } else {
@@ -55,5 +55,7 @@ module.exports = (request) => {
     } else {
         return 4002;
     }
+
+    return 200;
 
 }
