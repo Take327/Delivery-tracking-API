@@ -5,6 +5,7 @@ const requestCheck = require('./module/requestchecker.js');//リクエストチ�
 const metaSetControl = require('./module/setmeta.js');//メタオブジェクトセット用関数
 const getTrackingInfoJP = require('./module/asyncs/getTrackingInfoJP.js');
 const getTrackingInfoSG = require('./module/asyncs/getTrackingInfoSG.js');
+const getTrackingInfoYM = require('./module/asyncs/getTrackingInfoYM.js');
 
 
 /**
@@ -36,6 +37,9 @@ exports.getTrackingJson = functions.https.onRequest((request, response) => {
                 break;
             case 'SG':
                 getTrackingInfoSG(responseObject, request.query.tracking_number).then((r) => { response.send(`${JSON.stringify(r)}`); });
+                break;
+            case 'YM':
+                getTrackingInfoYM(responseObject, request.query.tracking_number).then((r) => { response.send(`${JSON.stringify(r)}`); });
                 break;
 
             default:

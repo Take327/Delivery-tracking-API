@@ -16,13 +16,20 @@ module.exports = async (responseObject, trackingNumber) => {
     const nodes = document.querySelectorAll('.table_basic.table_okurijo_detail2:nth-of-type(2) tr:nth-child(n + 2) td');
     const trackingInfoSG = Array.from(nodes).map(td => td.textContent.trim());
     const data = createTrakingInfoSG(trackingInfoSG);
+    
+    if (data.length === 0) {
+        const meta = {
+            code: 4017,                                 //httpレスポンスステータスコード
+            type: 'Bad Request',                        //httpレスポンスステータスタイプ
+            message: 'Tracking does not exist.',        //httpレスポンスメッセージ
+        }
 
-    console.log(trackingInfoSG);
-    result.data = data;
-
+        result.meta = meta;
+    } else {
+        result.data = data;
+    }
 
     return result;
-
 }
 
 
@@ -32,7 +39,6 @@ module.exports = async (responseObject, trackingNumber) => {
  */
 const createTrakingInfoSG = (trackingInfo) => {
     const tracking_info = [];
-    //JP追跡情報成形
     for (let i = 0, row = 1; trackingInfo.length > i; i += 3, row++) {
         tracking_info.push({
             date: trackingInfo[i + 1],

@@ -21,11 +21,10 @@ module.exports = async (responseObject, trackingNumber) => {
     const data = createTrakingInfoJP(jpTrackingInfo);
     if (data.length === 0) {
         const meta = {
-            code: 4017,                     //httpレスポンスステータスコード
-            type: 'Bad Request',                     //httpレスポンスステータスタイプ
-            message: 'Tracking does not exist.',                  //httpレスポンスメッセージ
+            code: 4017,                                 //httpレスポンスステータスコード
+            type: 'Bad Request',                        //httpレスポンスステータスタイプ
+            message: 'Tracking does not exist.',        //httpレスポンスメッセージ
         }
-
         result.meta = meta;
     } else {
         result.data = data;
@@ -41,7 +40,6 @@ module.exports = async (responseObject, trackingNumber) => {
  */
 const createTrakingInfoJP = (jpTrackingInfo) => {
     const tracking_info = [];
-    //JP追跡情報成形
     for (let i = 0, row = 1; jpTrackingInfo.length > i; i += 6, row++) {
         tracking_info.push({
             date: jpTrackingInfo[i],
