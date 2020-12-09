@@ -9,7 +9,7 @@ const App = () => {
         
     }, [resultJson]);
 
-    const deliveryCarrierList = ['JP', 'Yamato', 'Sagawa'];
+    const deliveryCarrierList = ['','JP', 'YM', 'SG'];
 
     const getjson = async () => {
         const url = `https://us-central1-tracking-delivery-status-api.cloudfunctions.net/getTrackingJson?delivery_carrier_code=${deliveryCarrierCode}&tracking_number=${trackingNumber}`;
